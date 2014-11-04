@@ -3,7 +3,6 @@ var directions = require('./directions.js').directions;
 var opposite = require('./directions.js').opposite;
 var pairs = require('./directions.js').pairs;
 
-
 function Scheme(n) {
 	for (var i = 0; i < n; i++) {
 		this[i] = new Ball(i);
@@ -17,24 +16,6 @@ Scheme.prototype.connect = function(ball1, dir, ball2) {
 	ball1[dir] = ball2;
 	ball2[opposite[dir]] = ball1;
 }
-
-Scheme.prototype.simpleRepresentation = function() {
-	var result = {};
-	for (var i = 0; i < this.count; i++) {
-		var simpleBall = {};
-		var ball = this[i];
-
-		directions.forEach(function (dir) {
-			if (ball[dir]) {
-				simpleBall[dir] = ball[dir].self;	
-			} else {
-				simpleBall[dir] = "?";
-			}
-		});
-		result[i] = simpleBall;
-	}
-	return result;
-};
 
 Scheme.prototype.toString = function() {
 	var result = "";
@@ -64,31 +45,16 @@ Scheme.prototype.copy = function() {
 	return copied;
 }
 
-
-Scheme.prototype.setupEnumeration = function(ball) {
-	var iterateBy = [];
-	directions.forEach(function(dir) {
-		if (!ball[dir]) iterateBy.push(dir);
-	});
-	ball.iterateBy = iterateBy;
-	var copy = this.copy();
-	// ball.iterateBy.forEach(function(dir) {
-	// 	copy[ball.self][dir] = copy[0];
-	// })
-}
-
 Scheme.prototype.schemeWithBallVariant = function(ball, variantNumber) {
 	var iterateBy = [];
 	directions.forEach(function(dir) {
 		if (!ball[dir]) iterateBy.push(dir);
 	});
-	// console.log(iterateBy);
 	var variantComponents = {};
 	for (var i = iterateBy.length - 1; i >= 0; i--) {
 		variantComponents[iterateBy[i]] = variantNumber % this.count;
 		variantNumber = Math.floor(variantNumber / this.count);
 	}
-	// console.log(variantComponents);
 	var copy = this.copy();
 	var iteratedBall = copy[ball.self];
 	Object.keys(variantComponents).forEach(function(dir) {
@@ -113,7 +79,6 @@ function autoFill(ball) {
 					return false;
 				}
 			} else {
-				// console.log("Connect(type 1)", otherBall.self, opposite[dir], ball.self);
 				otherBall[opposite[dir]] = ball;
 			}
 		}
@@ -175,11 +140,6 @@ function enumerateAllSchemes(startingScheme, startingBall, callback) {
 		}
 	}
 }
-
-// console.log("New scheme found(" + foundSchemesCount++ + "): ");
-// 				console.log(newScheme.toString());
-				
-// 				console.log("-----------");
 
 Scheme.prototype.enumerateAllSchemes = function(callback) {
 	this.foundSchemes = [];
