@@ -178,5 +178,31 @@ Scheme.fromJSON = function(json) {
 	return scheme;
 };
 
+Scheme.prototype.hasConnection = function(ballA, ballB) {
+	directions.forEach(function(dir) {
+		if (ballA[dir] == ballB) return true;
+	});
+	return false;
+}
+
+// Является ли схема связной
+Scheme.prototype.isConnected = function() {
+	var reachableFrom0 = [0];
+	var scheme = this;
+	while (true) {
+		var oldCount = reachableFrom0.length;
+		for (var i = 1; i < this.count; i++) {
+			reachableFrom0.forEach(function(r) {
+				if (scheme.hasConnection(scheme[i], scheme[r])) reachableFrom0.push(i);
+			});
+		}
+		var newCount = reachableFrom0.length;
+		if (newCount == oldCount) {
+			return newCount == scheme.count;
+		}
+	}
+
+}
+
 module.exports = Scheme;
 
