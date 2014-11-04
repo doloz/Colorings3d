@@ -98,7 +98,7 @@ Scheme.prototype.schemeWithBallVariant = function(ball, variantNumber) {
 }
 
 Scheme.prototype.numberOfVariants = function(ball) {
-	return Math.pow(this.count, 4 - ball.connectionsCount());
+	return Math.pow(this.count, directions.length - ball.connectionsCount());
 }
 
 
@@ -139,42 +139,36 @@ function autoFill(ball) {
 	return true;
 }
 
-function autoFillAll(scheme) {
+Scheme.prototype.autoFillAll = function() {
 	do {
-		var lastConnectionsCount = scheme.connectionsCount();
-		for (var i = 0; i < scheme.count; i++) {
-			var result = autoFill(scheme[i]);
+		var lastConnectionsCount = this.connectionsCount();
+		for (var i = 0; i < this.count; i++) {
+			var result = autoFill(this[i]);
 			if (!result) return false;
 		}
-	} while (lastConnectionsCount != scheme.connectionsCount());
+	} while (lastConnectionsCount != this.connectionsCount());
 	return true;
-}
+};
 
-var foundSchemes = [];
-var foundSchemesCount = 0;
-
-function enumerateAllSchemes(startingScheme, startingBall) {
+function enumerateAllSchemes(startingScheme, startingBall, callback) {
 	for (var variantNumber = 0; variantNumber < startingScheme.numberOfVariants(startingBall); variantNumber++) {
 		var newScheme = startingScheme.schemeWithBallVariant(startingBall, variantNumber);
-		if (autoFillAll(newScheme)) {
-			if (newScheme.connectionsCount() == 4 * newScheme.count) {
-				console.log("New scheme found(" + foundSchemesCount++ + "): ");
-				console.log(newScheme.toString());
-				foundSchemes.push(newScheme);
-				console.log("-----------");
+		if (newScheme.autoFillAll()) {
+			if (newScheme.connectionsCount() == directions.length * newScheme.count) { // found
+				callback(newScheme);
 				continue;
 			} else {
 				var maxConnections = 0;
 				var nextBallIndex = 0;
 				for (var i = 0; i < newScheme.count; i++) {
 					var connections = newScheme[i].connectionsCount();
-					if (connections < 4 && connections >= maxConnections) {
+					if (connections < directions.length && connections >= maxConnections) {
 						nextBallIndex = i;
 						maxConnections = connections;
 					}
 				}
 				var nextBall = newScheme[nextBallIndex];
-				enumerateAllSchemes(newScheme,nextBall);
+				enumerateAllSchemes(newScheme,nextBall, callback);
 			}
 		} else {
 			continue;
@@ -182,9 +176,19 @@ function enumerateAllSchemes(startingScheme, startingBall) {
 	}
 }
 
+// console.log("New scheme found(" + foundSchemesCount++ + "): ");
+// 				console.log(newScheme.toString());
+				
+// 				console.log("-----------");
 
-var x = new Scheme(6);
-x[0].left = x[1];
-autoFillAll(x);
-enumerateAllSchemes(x, x[0])
+Scheme.prototype.enumerateAllSchemes = function(callback) {
+	this.foundSchemes = [];
+	var foundSchemes = this.foundSchemes;
+	enumerateAllSchemes(this, this[0], function(scheme) {
+		foundSchemes.push(scheme);
+		callback(scheme);
+	});
+}
+
+module.exports = Scheme;
 

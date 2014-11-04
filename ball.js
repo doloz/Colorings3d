@@ -3,10 +3,9 @@ module.exports = Ball;
 var directions = require('./directions.js').directions;
 
 function Ball(x) {
-	this.left = null;
-	this.right = null;
-	this.top = null;
-	this.bottom = null;
+	directions.forEach(function(dir) {
+		this[dir] = null;
+	});
 	this.self = x;
 }
 
@@ -36,11 +35,11 @@ Ball.prototype.toString = function() {
 		}
 	});
 
-	return ("    " + simpleBall.top + "    \n" 
-		+ "    |    \n" 
+	return ("    " + simpleBall.top + "  " + simpleBall.front + "  \n" 
+		+ "    | /  \n" 
 		+ simpleBall.left + " - " + ball.self + " - " + simpleBall.right + "\n"
-		+ "    |    \n" 
-		+ "    " + simpleBall.bottom + "    \n");
+		+ "  / |    \n" 
+		+ " " + simpleBall.back + "  " + simpleBall.bottom + "    \n");
 }
 
 Ball.prototype.connectionsCount = function() {
