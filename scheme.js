@@ -150,5 +150,33 @@ Scheme.prototype.enumerateAllSchemes = function(callback) {
 	});
 }
 
+// Saving 
+
+Scheme.prototype.toJSON = function() {
+	var json = {
+		count: this.count
+	};
+
+	var scheme = this;
+	directions.forEach(function(dir) {
+		json[dir] = [];
+		for (var i = 0; i < scheme.count; i++) {
+			json[dir][i] = scheme[i][dir].self;
+		}
+	})
+	return json;
+};
+
+Scheme.fromJSON = function(json) {
+	var scheme = new Scheme(json.count);
+	directions.forEach(function(dir) {
+		var connections = json[dir];
+		for (var i = 0; i < connections; i++) {
+			scheme[i][dir] = scheme[connections[i]];
+		}
+	});
+	return scheme;
+};
+
 module.exports = Scheme;
 
