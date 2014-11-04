@@ -17,10 +17,14 @@ var startTime = new Date().getTime();
 x.enumerateAllSchemes(function(scheme) {
 	console.log("Найдено: ");
 	console.log(scheme.toString());
+	console.log(matrixToString(scheme.matrix()));
+	// console.log(scheme.isConnected());
 	console.log('-----------------');
 });
 
-var jsonString = JSON.stringify(x.foundSchemes.map(function(scheme){
+var jsonString = JSON.stringify(x.foundSchemes.filter(function(scheme){
+	return scheme.isConnected();
+}).map(function(scheme){
 	return scheme.toJSON()
 }));
 
@@ -33,3 +37,17 @@ console.log("Всего " + x.foundSchemes.length);
 
 var endTime = new Date().getTime();
 console.log("Время выполнения(мс): ",  endTime - startTime);
+
+function matrixToString(matrix) {
+	var c = matrix.length;
+	// console.log(matrix);
+	var result = "";
+	for (var i = 0; i < c; i++) {
+		result += "|";
+		for (var j = 0; j < c; j++) {
+			result += " " + matrix[i][j] + " ";
+		}
+		result += "|\n";
+	}
+	return result;
+}

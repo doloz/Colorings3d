@@ -171,7 +171,7 @@ Scheme.fromJSON = function(json) {
 	var scheme = new Scheme(json.count);
 	directions.forEach(function(dir) {
 		var connections = json[dir];
-		for (var i = 0; i < connections; i++) {
+		for (var i = 0; i < connections.length; i++) {
 			scheme[i][dir] = scheme[connections[i]];
 		}
 	});
@@ -179,30 +179,71 @@ Scheme.fromJSON = function(json) {
 };
 
 Scheme.prototype.hasConnection = function(ballA, ballB) {
+
 	directions.forEach(function(dir) {
 		if (ballA[dir] == ballB) return true;
+		 // console.log(dir, ballA[dir].self, ballA.self, ballB.self);
 	});
 	return false;
 }
 
+
 // Является ли схема связной
 Scheme.prototype.isConnected = function() {
 	var reachableFrom0 = [0];
-	var scheme = this;
 	while (true) {
 		var oldCount = reachableFrom0.length;
-		for (var i = 1; i < this.count; i++) {
-			reachableFrom0.forEach(function(r) {
-				if (scheme.hasConnection(scheme[i], scheme[r])) reachableFrom0.push(i);
-			});
+		for (var i = 0; i < reachableFrom0.length; i++) {
+			for (var j = 0; j < this.count; j++) {
+				if (this.hasConnection(this[i], this[j]) && reachableFrom0.indexOf(j) == -1) {
+					reachableFrom0.push(j);
+				}
+			}
 		}
 		var newCount = reachableFrom0.length;
 		if (newCount == oldCount) {
-			return newCount == scheme.count;
+			return reachableFrom0.length = this.count;
 		}
 	}
+	// var scheme = this;
+	// console.log(scheme);
+	// while (true) {
+	// 	console.log(reachableFrom0);
+	// 	var oldCount = reachableFrom0.length;
+	// 	for (var i = 1; i < scheme.count; i++) {
+	// 		reachableFrom0.forEach(function(r) {
+	// 			console.log(i, r, scheme.hasConnection(scheme[i], scheme[r]));
+	// 			if (scheme.hasConnection(scheme[i], scheme[r])) reachableFrom0.push(i);
+	// 		});
+	// 	}
+	// 	var newCount = reachableFrom0.length;
+	// 	if (newCount == oldCount) {
+	// 		return newCount == scheme.count;
+	// 	}
+	// }
 
 }
 
+Scheme.prototype.matrix = function(ballsToColorsBindings) {
+	var result = [];
+	var scheme = this;
+
+
+	for (var i = 0; i < this.count; i++) {
+		var row = [];
+		for (var j = 0; j < this.count; j++) {
+			row.push(0);
+		}
+
+		directions.forEach(function(dir) {
+			var j = scheme[i][dir].self;
+			row[j] = row[j] + 1;
+		});
+		result.push(row);
+	}
+	return result;
+}
+
 module.exports = Scheme;
+
 
